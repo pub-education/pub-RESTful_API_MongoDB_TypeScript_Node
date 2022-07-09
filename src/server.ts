@@ -3,6 +3,8 @@ import http from 'http';
 import mongoose from 'mongoose';
 import { config } from './config/config';
 import Logging from './library/Logging';
+import authorRoutes from './routes/Author';
+import bookRoutes from './routes/Book';
 
 const router = express();
 
@@ -14,7 +16,7 @@ const startServer = () => {
 
     /** Log the Response */
     res.on('finish', () => {
-      Logging.info(`Incomming -> Method: [${req.method}] - url: [${req.url}] - IP: [${req.socket.remoteAddress}] - Status: [${res.statusCode}]`);
+      Logging.info(`Outgoing -> Method: [${req.method}] - url: [${req.url}] - IP: [${req.socket.remoteAddress}] - Status: [${res.statusCode}]`);
     });
 
     // Calling next() allows us to pass through
@@ -40,6 +42,8 @@ const startServer = () => {
   });
 
   /** Routes */
+  router.use('/authors', authorRoutes);
+  router.use('/books', bookRoutes);
 
   /** Healthcheck */
   router.get('/ping', (req, res, next) => res.status(200).json({ message: 'pong' }));
@@ -52,7 +56,7 @@ const startServer = () => {
     return res.status(404).json({ message: error.message });
   });
 
-  http.createServer(router).listen(config.server.port, () => Logging.info(`Server is running ono port ${config.server.port}.`));
+  http.createServer(router).listen(config.server.port, () => Logging.info(`Server is running on port ${config.server.port}.`));
 };
 
 /** Connect to MongoDB Atlas */
